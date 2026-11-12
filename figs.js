@@ -4026,13 +4026,110 @@ window.__XBOT = 'S2F5ZGFyYSBGQlggQmluYXJ5ICAAGgAUHgAApgsAAAAAAAAAAAAAAAAAAAAAAAA
     };
   }
 
+  // ── Posed motions added for the assessment page (no capture behind them), built the same way as hop():
+  // each bone is aimed in world space from the model's bind pose. Model faces +z, its left is +x, up is +y.
+  function rig(bd) {
+    const B = bd.B, group = bd.group;
+    const wquat = b => b.getWorldQuaternion(new THREE.Quaternion());
+    group.rotation.y = 0; group.position.set(0, 0, 0); group.updateMatrixWorld(true);
+    const names = ['Hips', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase', 'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand'];
+    const bindQ = {}, bindP = {};
+    names.forEach(n => { bindQ[n] = wquat(B(n)); bindP[n] = wpos(B(n)); });
+    const dir = (a, b) => bindP[b].clone().sub(bindP[a]).normalize(), D0 = {};
+    ['Left', 'Right'].forEach(s => {
+      D0[s + 'UpLeg'] = dir(s + 'UpLeg', s + 'Leg'); D0[s + 'Leg'] = dir(s + 'Leg', s + 'Foot'); D0[s + 'Foot'] = dir(s + 'Foot', s + 'ToeBase');
+      D0[s + 'Arm'] = dir(s + 'Arm', s + 'ForeArm'); D0[s + 'ForeArm'] = dir(s + 'ForeArm', s + 'Hand');
+    });
+    const floor0 = Math.min(bindP.LeftToeBase.y, bindP.RightToeBase.y);
+    const setWorld = (n, q) => { const b = B(n); b.parent.updateMatrixWorld(true); b.quaternion.copy(wquat(b.parent).invert().multiply(q)); b.updateMatrixWorld(true); };
+    const aim = (n, v) => setWorld(n, new THREE.Quaternion().setFromUnitVectors(D0[n], v.clone().normalize()).multiply(bindQ[n]));
+    const R = Math.PI / 180;
+    const down = (d, x) => new THREE.Vector3(x || 0, -Math.cos(d * R), Math.sin(d * R));   // d degrees forward of straight down
+    const ahead = d => new THREE.Vector3(0, Math.sin(d * R), Math.cos(d * R));
+    const handFollows = s => setWorld(s + 'Hand', wquat(B(s + 'ForeArm')).multiply(bindQ[s + 'ForeArm'].clone().invert()).multiply(bindQ[s + 'Hand']));
+    return {
+      B, group, R, down, ahead, aim, handFollows,
+      // hips tilt (lean, degrees forward) and both legs as [hip, knee, ankle] like hop()
+      body(lean, L, Rl) {
+        group.rotation.y = 0; group.position.set(0, 0, 0); group.updateMatrixWorld(true);
+        setWorld('Hips', new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), lean * R).multiply(bindQ.Hips));
+        [['Left', L, 0.06], ['Right', Rl, -0.06]].forEach(([s, l, w]) => {
+          aim(s + 'UpLeg', down(l[0], w)); aim(s + 'Leg', down(l[0] - l[1], w * 0.5)); aim(s + 'Foot', ahead(-l[2] - 25));
+        });
+      },
+      // stand the lowest foot point on the floor and turn the figure toward the camera
+      place(turn, foot) {
+        group.updateMatrixWorld(true);
+        const low = Math.min(...(foot || ['Left', 'Right']).map(s => Math.min(wpos(B(s + 'ToeBase')).y, wpos(B(s + 'Foot')).y - 0.06)));
+        group.position.y = floor0 - low; group.rotation.y = turn; group.updateMatrixWorld(true);
+      },
+    };
+  }
+  // Keyframe track: rows of [time, ...values]; values may be numbers or arrays; eased between rows
+  const track = K => t => {
+    let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++;
+    const a = K[i], b = K[i + 1], u = ss(a[0], b[0], t);
+    const mix = (x, y) => Array.isArray(x) ? x.map((v, j) => v + (y[j] - v) * u) : x + (y - x) * u;
+    return a.map((x, j) => j ? mix(x, b[j]) : t);
+  };
+
+  // Single-leg squat on the left leg (Plyometric Prep Screen): free leg held forward, arms out front for
+  // balance, bend the stance knee to ~60° (a clinic single-leg squat, not a pistol: a deep squat with the
+  // free leg straight out front read as sitting down), pause, stand back up. The free foot stays lifted
+  // behind with the knee bent, so it is clearly one leg the whole time. Shown from the front-left.
+  function slSquat(bd) {
+    const r = rig(bd);
+    // [time, lean, stance [hip, knee, ankle], free leg [hip, knee, ankle], arms forward]
+    const at = track([[0, 3, [3, 5, 0], [14, 108, 5], 30], [0.5, 3, [3, 5, 0], [14, 108, 5], 30],
+                      [1.9, 18, [48, 62, 0], [8, 112, 5], 75], [2.5, 18, [48, 62, 0], [8, 112, 5], 75],
+                      [3.8, 3, [3, 5, 0], [14, 108, 5], 30], [4.4, 3, [3, 5, 0], [14, 108, 5], 30]]);
+    const frame = t => {
+      const [, lean, L, F, arm] = at(t);
+      r.body(lean, L, F);
+      [['Left', 0.18], ['Right', -0.18]].forEach(([s, w]) => { r.aim(s + 'Arm', r.down(arm, w)); r.aim(s + 'ForeArm', r.down(arm + 5, w * 0.6)); r.handFollows(s); });
+      r.place(Math.PI / 2 - 0.3, ['Left']);
+    };
+    return { dur: 4.4, still: 2.2, belt: 0, frame };
+  }
+
+  // Throwing warm-up (Throwing Prep Screen): band external rotation at 90/90 with the throwing (right) arm.
+  // Upper arm straight out to the side at shoulder height, elbow bent 90°; the forearm turns from pointing
+  // forward to pointing up against a band anchored in front. Shown from the throwing-arm side.
+  function cuff(bd) {
+    const r = rig(bd), scene = [];
+    const band = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+                                new THREE.LineBasicMaterial({ color: 0xff4fa3, transparent: true, opacity: 0.9 }));
+    band.frustumCulled = false;
+    const anchor = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshBasicMaterial({ color: 0xff4fa3 }));
+    // [time, external rotation degrees (0 = forearm forward, 90 = straight up)]
+    const at = track([[0, 5], [0.6, 5], [1.5, 95], [1.9, 95], [2.8, 5], [3.1, 5], [4.0, 95], [4.4, 95], [5.3, 5], [5.9, 5]]);
+    const frame = t => {
+      const [, er] = at(t);
+      r.body(0, [2, 6, 0], [2, 6, 0]);
+      r.aim('LeftArm', r.down(4, 0.2)); r.aim('LeftForeArm', r.down(12, 0.1)); r.handFollows('Left');
+      r.aim('RightArm', new THREE.Vector3(-1, 0.02, 0.08));                                  // abducted 90°
+      r.aim('RightForeArm', new THREE.Vector3(0, Math.sin(er * r.R), Math.cos(er * r.R)));   // rotates forward -> up
+      r.handFollows('Right');
+      r.place(2.3);   // from behind the throwing shoulder: arm, forearm turn, and band all on one side: the arm out to the side and the forearm turning both read
+      // band from a fixed point in front of the shoulder to the hand
+      const hand = wpos(r.B('RightHand')), sh = wpos(r.B('RightArm'));
+      if (!anchor.parent && r.group.parent) { r.group.parent.add(band); r.group.parent.add(anchor); }
+      if (!anchor.userData.set) { const f = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), r.group.rotation.y);
+        const side = new THREE.Vector3(-1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), r.group.rotation.y);   // the throwing-arm side
+        anchor.position.copy(sh).addScaledVector(f, 0.75).addScaledVector(side, 0.42); anchor.userData.set = 1; }   // in front of the elbow
+      band.geometry.setFromPoints([anchor.position, hand]);
+    };
+    return { dur: 5.9, still: 1.5, belt: 0, frame };
+  }
+  const POSED = { 'lower-body': hop, 'sl-squat': slSquat, 'throw-prep': cuff };
+
   function view(host) {
     const name = host.dataset.fig, cv = host.querySelector('canvas');
     const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
     const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(26, 1, 0.05, 40);
     const bd = body(getModel()); scene.add(bd.group);
     const grid = new THREE.GridHelper(8, 40, ACCENT, ACCENT); grid.material.transparent = true; grid.material.opacity = 0.16; scene.add(grid);
-    const clip = FIGS[name] ? capture(FIGS[name], bd) : hop(bd);
+    const clip = FIGS[name] ? capture(FIGS[name], bd) : (POSED[name] || hop)(bd);
     const look = new THREE.Vector3(0, 1.0, 0);   // a little headroom for arms overhead
     camera.position.set(0.9, 1.2, 5.7); camera.lookAt(look);
     const fit = () => {
@@ -4081,6 +4178,6 @@ window.__XBOT = 'S2F5ZGFyYSBGQlggQmluYXJ5ICAAGgAUHgAApgsAAAAAAAAAAAAAAAAAAAAAAAA
     document.querySelectorAll('.fig[data-fig]').forEach(h => { if (!h.__fig) { h.__fig = 1; io.observe(h); } });
   }
   addEventListener('resize', () => views.forEach(v => { v.fit(); v.draw(v.clip.still); }));
-  window.MORFigs = { scan, views };
+  window.MORFigs = { scan, views, mount };   // mount: for checks from the console (draws without waiting to be on screen)
   scan();
 })();

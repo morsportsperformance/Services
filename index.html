@@ -200,10 +200,10 @@ const REPORTS = 'https://morsportsperformance.github.io/mor-sports-performance/'
 
 // fig = which neon X Bot figure the card and result show (same clips as the sample reports page)
 window.SERVICES = {
-  throwPrep: { group: 'throw', fig: 'pitching', book: BOOK(30), video: 'Vqx7PQK07hE', report: null,           price: '$249', minutes: 90 },
+  throwPrep: { group: 'throw', fig: 'throw-prep', book: BOOK(30), video: 'Vqx7PQK07hE', report: null,           price: '$249', minutes: 90 },
   throwing:  { group: 'throw', fig: 'softball', book: BOOK(12), video: 'h4fmiZQKShQ', report: REPORTS + '#pitching', report2: REPORTS + '#softball', price: '$349', minutes: 90 },
   mocap:     { group: 'throw', fig: 'pitching', book: BOOK(35), video: 'Vqx7PQK07hE', report: null, lab: 'https://morsportsperformance.github.io/TVloop/book/', price: '$249', minutes: 60 },
-  plyo:      { group: 'legs', fig: 'lower-body',  book: BOOK(27), video: 'vPuw8BnEX3w', report: null,           price: '$249', minutes: 30 },
+  plyo:      { group: 'legs', fig: 'sl-squat',  book: BOOK(27), video: 'vPuw8BnEX3w', report: null,           price: '$249', minutes: 30 },
   lba:       { group: 'legs', fig: 'lower-body',  book: BOOK(5),  video: 'WD2CXEOYAeY', report: REPORTS + '#lower-body', price: '$349', minutes: 120 },
   running:   { group: 'legs', fig: 'running',  book: BOOK(14), video: 'BI-rSdgpQ-s', report: REPORTS + '#running', price: '$349', minutes: 150 },
   upper:     { group: 'arm',   book: BOOK(33), video: null,          report: null,           price: '$249', minutes: 90 },
@@ -301,8 +301,9 @@ window.STR = { en: {
     ['Is there a discount?', 'Book online and use code MORSPC at checkout for $25 off your first appointment.'],
     ['Can I book on my phone?', 'Yes. Get the Mindbody app and search for Midwest Orthopaedics.'],
     ['What happens after my assessment?', 'We go over your results with you the same day and email your report. You then receive exercises to address any deficits noted. You can then train independently or work with us in one-on-one training sessions.'],
+    ['Can I sign up for training without an assessment?', 'Training starts with an assessment, so we know what to work on. Answer the questions at the top of this page to pick yours. After your assessment, you can book one-on-one training sessions with us.'],   // DRAFT
   ],
-  training_book: 'Book a training session',
+  training_book: 'Already had your assessment? Book a training session',
   apps: 'Get the Mindbody app',
   ios: 'App Store (iPhone)', android: 'Google Play (Android)',
   contact: 'Questions? Call 708-492-5782 or email spc@rushortho.com',
@@ -438,8 +439,9 @@ es: {
     ['¿Hay algún descuento?', 'Reserve en línea y use el código MORSPC al pagar para obtener $25 de descuento en su primera cita.'],
     ['¿Puedo reservar desde mi teléfono?', 'Sí. Descargue la aplicación Mindbody y busque Midwest Orthopaedics.'],
     ['¿Qué pasa después de mi evaluación?', 'Revisamos sus resultados con usted el mismo día y le enviamos su informe por correo electrónico. Después recibe ejercicios para trabajar en las deficiencias encontradas. Luego puede entrenar por su cuenta o trabajar con nosotros en sesiones de entrenamiento individuales.'],
+    ['¿Puedo inscribirme en entrenamiento sin una evaluación?', 'El entrenamiento empieza con una evaluación, para saber en qué trabajar. Responda las preguntas al principio de esta página para elegir la suya. Después de su evaluación, puede reservar sesiones de entrenamiento individuales con nosotros.'],
   ],
-  training_book: 'Reservar una sesión de entrenamiento',
+  training_book: '¿Ya tuvo su evaluación? Reserve una sesión de entrenamiento',
   apps: 'Descargue la aplicación Mindbody',
   ios: 'App Store (iPhone)', android: 'Google Play (Android)',
   contact: '¿Preguntas? Llame al 708-492-5782 o escriba a spc@rushortho.com',
