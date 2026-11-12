@@ -104,6 +104,19 @@ h1 { font: 700 clamp(44px, 10vw, 72px)/.95 'Barlow Condensed', sans-serif; }
   .cap { left: auto; right: 8px; bottom: 22px; }
 }
 .doctor { margin-top: 22px; }
+/* "What you get": four facts along the bottom of the hero, divided by hairlines */
+.gets { list-style: none; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,.1); margin-top: 8px; }
+.gets li { padding: 16px 12px 18px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.gets li:nth-child(even) { padding-left: 14px; border-left: 1px solid rgba(255,255,255,.1); }
+.gets b { display: block; font: 700 30px/1 'Barlow Condensed', sans-serif; color: #7ff0d6; text-shadow: 0 0 18px rgba(40,191,161,.45); font-variant-numeric: tabular-nums; }
+.gets span { display: block; margin-top: 6px; font-size: 14px; line-height: 1.3; color: #b4bebb; }
+@media (min-width: 760px) {
+  .gets { grid-template-columns: repeat(4, 1fr); }
+  .gets li { padding: 18px 16px 22px; border-bottom: 0; }
+  .gets li:first-child { padding-left: 0; }
+  .gets li + li { border-left: 1px solid rgba(255,255,255,.1); }
+  .gets b { font-size: 36px; }
+}
 .open .ico { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
 .open .ico svg { width: 16px; height: 16px; }
 .doctor { margin-top: 16px; padding: 12px 16px; border-left: 4px solid var(--accent); background: var(--glass); border-radius: 10px; font-size: 16px; }
@@ -249,6 +262,7 @@ footer a { color: var(--accent); font-weight: 600; }
       </div>
       <div class="hero-stage fig" data-fig="hero" id="heroFig" aria-hidden="true"><canvas></canvas><span class="cap" id="heroCap"></span></div>
     </div>
+    <ul class="gets" id="gets"></ul>
   </div>
 </header>
 <div class="wrap">
@@ -342,6 +356,14 @@ window.STR = { en: {
   lede: 'Answer two or three quick questions and we will point you to the right appointment.',
   open_note: 'Open to patients and the public. No referral or prescription needed!',
   start_btn: 'Find my assessment',
+  // "What you get" strip along the bottom of the hero. Facts only: 300 fps is the throwing capture (TV loop wording),
+  // same day + emailed report + exercises are from the FAQ answer Dave wrote. count = animate the number up once.
+  gets: [
+    { big: '300', count: 300, sub: 'frames per second on every throw' },
+    { big: 'Same day', sub: 'we go over your results with you' },
+    { big: 'Emailed', sub: 'your report, to you and your doctor' },
+    { big: 'Your plan', sub: 'exercises to address what we find' },
+  ],
   hero_caps: { pitching: 'Baseball pitch', running: 'Treadmill run', 'sl-squat': 'Single-leg squat', softball: 'Softball pitch' },
   doctor_note: 'Did your doctor order a “Functional Sports Assessment” or “Sports Assessment”? Start here. These questions match you to the right one.',
   step: 'Question {n}',
@@ -509,6 +531,12 @@ es: {
   lede: 'Responda dos o tres preguntas rápidas y le indicaremos la cita correcta.',
   open_note: 'Abierto a pacientes y al público. ¡No necesita referido ni receta médica!',
   start_btn: 'Encontrar mi evaluación',
+  gets: [
+    { big: '300', count: 300, sub: 'cuadros por segundo en cada lanzamiento' },
+    { big: 'El mismo día', sub: 'revisamos sus resultados con usted' },
+    { big: 'Por correo', sub: 'su informe, para usted y su médico' },
+    { big: 'Su plan', sub: 'ejercicios para trabajar en lo que encontramos' },
+  ],
   hero_caps: { pitching: 'Lanzamiento de béisbol', running: 'Carrera en caminadora', 'sl-squat': 'Sentadilla a una pierna', softball: 'Lanzamiento de sóftbol' },
   doctor_note: '¿Su médico le ordenó una “Functional Sports Assessment” o “Sports Assessment”? Empiece aquí. Estas preguntas le indican cuál es la correcta.',
   step: 'Pregunta {n}',
@@ -768,6 +796,23 @@ es: {
     });
   }
 
+  // "What you get": numbers count up once from 0 when the page opens (straight to the value with reduced motion)
+  let counted = false;
+  function countUp() {
+    counted = true;
+    const els = [...document.querySelectorAll('#gets [data-count]')];
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { els.forEach(e => e.textContent = e.dataset.count); return; }
+    const t0 = performance.now(), D = 1400;
+    const step = now => {
+      const u = Math.min(1, (now - t0) / D), k = 1 - Math.pow(1 - u, 3);
+      document.querySelectorAll('#gets [data-count]').forEach(e => e.textContent = Math.round(k * e.dataset.count));
+      if (u < 1) requestAnimationFrame(step);
+    };
+    setTimeout(() => requestAnimationFrame(step), 400);
+    // if animation frames are paused (background tab), never leave a 0 showing
+    setTimeout(() => document.querySelectorAll('#gets [data-count]').forEach(e => e.textContent = e.dataset.count), 400 + D + 600);
+  }
+
   // Hero: the button jumps to the questions; the caption names whichever motion the figure is showing
   let heroKey = null;
   document.getElementById('heroGo').onclick = () => document.getElementById('chooser').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
@@ -804,6 +849,9 @@ es: {
       ${st.chips.length ? `<div class="chips">${st.chips.map(chip).join('')}</div>` : ''}</li>`).join('');
     document.getElementById('healthy').innerHTML = `<span>${esc(S('path_healthy'))}</span>${chip('mocap')}`;
     document.querySelectorAll('#path [data-a]').forEach(b => b.onclick = () => go(['start'], b.dataset.a));
+    document.getElementById('gets').innerHTML = S('gets').map(g =>
+      `<li><b${g.count ? ` data-count="${g.count}"` : ''}>${esc(counted || !g.count ? g.big : '0')}</b><span>${esc(g.sub)}</span></li>`).join('');
+    if (!counted) countUp();
     document.getElementById('mosaic').innerHTML = S('photos').map(p =>
       `<figure><img src="img/${p.f}" alt="${esc(p.alt)}" loading="lazy" decoding="async"><figcaption>${esc(p.cap)}</figcaption></figure>`).join('');
     document.getElementById('team').innerHTML = S('team').map(m =>
