@@ -184,6 +184,29 @@ section.path { padding: 52px 0 0; }
   .step-i::before { left: 44px; right: -14px; top: 17px; bottom: auto; width: auto; height: 2px; background: linear-gradient(90deg, var(--accent), rgba(40,191,161,.18)); }
 }
 @media (prefers-reduced-motion: reduce) { .node { animation: none; } .chip { transition: none; } }
+/* Inside our lab: photo mosaic (lab photo large) and the team */
+section.lab { padding: 52px 0 0; }
+.mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+.mosaic figure { position: relative; margin: 0; border-radius: 14px; overflow: hidden; background: #0b0f14; aspect-ratio: 16 / 10; }
+.mosaic figure:first-child { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+.mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+.mosaic figure:hover img { transform: scale(1.04); }
+.mosaic figure:nth-child(2) img { object-position: 50% 15%; }   /* keep the pitcher's head in frame */
+.mosaic figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 10px 8px; font: 600 14px/1.2 'Barlow', sans-serif; color: #fff;
+  background: linear-gradient(transparent, rgba(0,0,0,.72)); }
+.team-h { font: 700 15px/1 'Barlow Condensed', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 26px 0 12px; }
+.team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.member { text-align: center; }
+.member img { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); box-shadow: 0 0 0 4px rgba(40,191,161,.14); }
+.member b { display: block; font-size: 16px; margin-top: 8px; line-height: 1.2; }
+.member span { display: block; font-size: 14px; color: var(--muted); }
+@media (min-width: 760px) {
+  .mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 150px; }
+  .mosaic figure { aspect-ratio: auto; }
+  .mosaic figure:first-child { grid-column: 1 / 3; grid-row: 1 / 3; aspect-ratio: auto; }
+  .mosaic figure:nth-child(5) { grid-column: span 2; }   /* five photos: fill the bottom row */
+}
+@media (prefers-reduced-motion: reduce) { .mosaic img { transition: none; } }
 section.faq { padding: 48px 0 0; }
 details { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; margin-top: 10px; }
 summary { cursor: pointer; padding: 16px; font-weight: 600; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
@@ -237,6 +260,13 @@ footer a { color: var(--accent); font-weight: 600; }
       <p class="sec-lede" data-s="path_lede"></p>
       <ol class="steps" id="steps"></ol>
       <p class="healthy" id="healthy"></p>
+    </section>
+    <section class="lab" id="lab">
+      <h2 class="sec" data-s="lab_title"></h2>
+      <p class="sec-lede" data-s="lab_lede"></p>
+      <div class="mosaic" id="mosaic"></div>
+      <h3 class="team-h" data-s="team_title"></h3>
+      <div class="team" id="team"></div>
     </section>
     <section class="faq">
       <h2 class="sec" data-s="faq_title"></h2>
@@ -375,6 +405,22 @@ window.STR = { en: {
   path_step: 'Step {n}',
   path_train: 'Book training',
   path_healthy: 'Not recovering from an injury? Start with a full assessment, or see your throw in 3D:',
+  // Inside the lab: photos (alt text = what the photo shows) and the team. DRAFT captions.
+  lab_title: 'Inside our lab',
+  lab_lede: 'At Bo Jackson’s Elite Sports Dome in Bensenville.',
+  photos: [
+    { f: 'mocap-lab.jpg', cap: 'Our motion capture lab', alt: 'Our motion capture lab: a pitching mound and a treadmill surrounded by cameras mounted on the frame and walls' },
+    { f: 'throwing-pitcher.jpg', cap: 'Throwing in the lab', alt: 'A pitcher at the top of his leg lift in the motion capture lab, with cameras mounted on the frame around him' },
+    { f: 'running-treadmill.jpg', cap: 'Running in the lab', alt: 'A runner on the treadmill in the motion capture lab, with cameras mounted on the frame around her' },
+    { f: 'measure-standing.jpg', cap: 'Range of motion testing', alt: 'An athletic trainer measuring an athlete’s hip while she stands with one foot on a box, with a tablet on a tripod recording' },
+    { f: 'training-person.jpg', cap: 'Training in the dome', alt: 'An athlete training in the dome, shouldering a squat machine' },
+  ],
+  team_title: 'Who you’ll work with',
+  team: [
+    { f: 'headshot-dave.jpg', n: 'Dave Heidloff', r: 'Athletic trainer (ATC)' },
+    { f: 'headshot-elizabeth.jpg', n: 'Elizabeth Belinsky', r: 'Athletic trainer (ATC)' },
+    { f: 'headshot-brittany.jpg', n: 'Brittany Dowling', r: 'Biomechanist' },
+  ],
   faq_title: 'Good to know',
   faq: [
     ['Do I need a referral or prescription?', 'No. All services are available to both patients and the public. No referral or prescription needed!'],
@@ -526,6 +572,21 @@ es: {
   path_step: 'Paso {n}',
   path_train: 'Reservar entrenamiento',
   path_healthy: '¿No se está recuperando de una lesión? Empiece con una evaluación completa, o vea su lanzamiento en 3D:',
+  lab_title: 'Dentro de nuestro laboratorio',
+  lab_lede: 'En Bo Jackson’s Elite Sports Dome, en Bensenville.',
+  photos: [
+    { f: 'mocap-lab.jpg', cap: 'Nuestro laboratorio de captura de movimiento', alt: 'Nuestro laboratorio de captura de movimiento: un montículo de lanzamiento y una caminadora rodeados de cámaras montadas en la estructura y las paredes' },
+    { f: 'throwing-pitcher.jpg', cap: 'Lanzando en el laboratorio', alt: 'Un lanzador en lo alto de su levantamiento de pierna en el laboratorio de captura de movimiento, con cámaras a su alrededor' },
+    { f: 'running-treadmill.jpg', cap: 'Corriendo en el laboratorio', alt: 'Una corredora en la caminadora del laboratorio de captura de movimiento, con cámaras a su alrededor' },
+    { f: 'measure-standing.jpg', cap: 'Pruebas de rango de movimiento', alt: 'Un entrenador atlético mide la cadera de una atleta mientras ella apoya un pie en una caja, con una tableta en un trípode grabando' },
+    { f: 'training-person.jpg', cap: 'Entrenando en el domo', alt: 'Un atleta entrenando en el domo con una máquina de sentadillas' },
+  ],
+  team_title: 'Con quién trabajará',
+  team: [
+    { f: 'headshot-dave.jpg', n: 'Dave Heidloff', r: 'Athletic trainer (ATC)' },
+    { f: 'headshot-elizabeth.jpg', n: 'Elizabeth Belinsky', r: 'Athletic trainer (ATC)' },
+    { f: 'headshot-brittany.jpg', n: 'Brittany Dowling', r: 'Especialista en biomecánica' },
+  ],
   faq_title: 'Información útil',
   faq: [
     ['¿Necesito un referido o una receta médica?', 'No. Todos los servicios están disponibles para pacientes y para el público. ¡No necesita referido ni receta médica!'],
@@ -743,6 +804,10 @@ es: {
       ${st.chips.length ? `<div class="chips">${st.chips.map(chip).join('')}</div>` : ''}</li>`).join('');
     document.getElementById('healthy').innerHTML = `<span>${esc(S('path_healthy'))}</span>${chip('mocap')}`;
     document.querySelectorAll('#path [data-a]').forEach(b => b.onclick = () => go(['start'], b.dataset.a));
+    document.getElementById('mosaic').innerHTML = S('photos').map(p =>
+      `<figure><img src="img/${p.f}" alt="${esc(p.alt)}" loading="lazy" decoding="async"><figcaption>${esc(p.cap)}</figcaption></figure>`).join('');
+    document.getElementById('team').innerHTML = S('team').map(m =>
+      `<div class="member"><img src="img/${m.f}" alt="" loading="lazy"><b>${esc(m.n)}</b><span>${esc(m.r)}</span></div>`).join('');
     document.getElementById('faq').innerHTML = S('faq').map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
   }
   // The figures' 3D pieces (~1.5 MB) load in the background after the page is up, so the questions show instantly
