@@ -71,10 +71,39 @@ a { color: inherit; }
 .lang button { font: 600 14px/1 'Barlow', sans-serif; border: 0; background: none; color: var(--muted); padding: 9px 13px; cursor: pointer; }
 .lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
-header { padding: 32px 0 12px; }
-h1 { font: 700 clamp(40px, 9vw, 60px)/1 'Barlow Condensed', sans-serif; }
-.lede { margin-top: 12px; font-size: 20px; color: var(--muted); }
+h1 { font: 700 clamp(44px, 10vw, 72px)/.95 'Barlow Condensed', sans-serif; }
+.lede { margin-top: 14px; font-size: 20px; color: var(--muted); }
 .open { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-weight: 600; font-size: 17px; }
+
+/* Hero: an always-dark lab band across the top, the neon figure cycling through real motions */
+.hero { position: relative; overflow: hidden; color: #f2f2ef;
+  background: radial-gradient(ellipse 70% 90% at 72% 100%, #12302b 0%, #0b0f14 62%), #0b0f14; }
+.hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, #28bfa1, transparent); opacity: .6; }
+.hero-in { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.hero .top { padding-top: 16px; }
+.hero .lang { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); }
+.hero .lang button { color: #c9d2cf; }
+.hero .lang button[aria-pressed="true"] { color: var(--accent-ink); }
+.hero-grid { display: grid; grid-template-columns: 1fr; padding-top: 26px; }
+.hero h1 { color: #fff; }
+.hero .lede { color: #b4bebb; }
+.hero .open { color: #fff; }
+.hero-go { display: inline-flex; margin-top: 22px; padding: 14px 26px; box-shadow: 0 10px 30px -10px rgba(40,191,161,.7); }
+.hero .hero-stage { position: relative; height: 300px; margin: 6px -16px 0; background: none; }
+/* fade the stage's edges so the grid floor melts into the band instead of ending in a hard line */
+.hero-stage canvas { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 84%, transparent 100%), linear-gradient(0deg, transparent 0, #000 22%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 84%, transparent 100%), linear-gradient(0deg, transparent 0, #000 22%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+.hero-stage canvas { opacity: 0; }
+.cap { position: absolute; left: 16px; bottom: 14px; font: 600 13px/1 'Barlow Condensed', sans-serif; letter-spacing: .14em; text-transform: uppercase;
+  color: #7ff0d6; background: rgba(11,15,20,.85); border: 1px solid rgba(40,191,161,.6); padding: 7px 11px; border-radius: 999px; transition: opacity .4s; z-index: 1; }
+.cap:empty { opacity: 0; }
+@media (min-width: 760px) {
+  .hero-grid { grid-template-columns: 1fr 1.05fr; align-items: center; padding: 18px 0 8px; }
+  .hero .hero-stage { height: 440px; margin: 0; }
+  .cap { left: auto; right: 8px; bottom: 22px; }
+}
+.doctor { margin-top: 22px; }
 .open .ico { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
 .open .ico svg { width: 16px; height: 16px; }
 .doctor { margin-top: 16px; padding: 12px 16px; border-left: 4px solid var(--accent); background: var(--glass); border-radius: 10px; font-size: 16px; }
@@ -157,17 +186,25 @@ footer a { color: var(--accent); font-weight: 600; }
 </head>
 <body>
 <div class="aura" aria-hidden="true"><i></i><i></i></div>
-<div class="wrap">
-  <div class="top">
-    <div class="brand" data-s="kicker"></div>
-    <div class="lang" role="group" aria-label="Language" id="lang"></div>
+<header class="hero">
+  <div class="hero-in">
+    <div class="top">
+      <div class="brand" data-s="kicker"></div>
+      <div class="lang" role="group" aria-label="Language" id="lang"></div>
+    </div>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <h1 data-s="title"></h1>
+        <p class="lede" data-s="lede"></p>
+        <p class="open"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-s="open_note"></span></p>
+        <button class="btn hero-go" id="heroGo" data-s="start_btn"></button>
+      </div>
+      <div class="hero-stage fig" data-fig="hero" id="heroFig" aria-hidden="true"><canvas></canvas><span class="cap" id="heroCap"></span></div>
+    </div>
   </div>
-  <header>
-    <h1 data-s="title"></h1>
-    <p class="lede" data-s="lede"></p>
-    <p class="open"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span data-s="open_note"></span></p>
-    <p class="doctor" data-s="doctor_note"></p>
-  </header>
+</header>
+<div class="wrap">
+  <p class="doctor" data-s="doctor_note"></p>
   <main>
     <div id="chooser" class="panel" aria-live="polite"></div>
     <section class="faq">
@@ -243,6 +280,8 @@ window.STR = { en: {
   kicker: 'MOR Sports Performance',
   lede: 'Answer two or three quick questions and we will point you to the right appointment.',
   open_note: 'Open to patients and the public. No referral or prescription needed!',
+  start_btn: 'Find my assessment',
+  hero_caps: { pitching: 'Baseball pitch', running: 'Treadmill run', 'sl-squat': 'Single-leg squat', softball: 'Softball pitch' },
   doctor_note: 'Did your doctor order a “Functional Sports Assessment” or “Sports Assessment”? Start here. These questions match you to the right one.',
   step: 'Question {n}',
   back: 'Back',
@@ -380,6 +419,8 @@ es: {
   kicker: 'MOR Sports Performance',
   lede: 'Responda dos o tres preguntas rápidas y le indicaremos la cita correcta.',
   open_note: 'Abierto a pacientes y al público. ¡No necesita referido ni receta médica!',
+  start_btn: 'Encontrar mi evaluación',
+  hero_caps: { pitching: 'Lanzamiento de béisbol', running: 'Carrera en caminadora', 'sl-squat': 'Sentadilla a una pierna', softball: 'Lanzamiento de sóftbol' },
   doctor_note: '¿Su médico le ordenó una “Functional Sports Assessment” o “Sports Assessment”? Empiece aquí. Estas preguntas le indican cuál es la correcta.',
   step: 'Pregunta {n}',
   back: 'Atrás',
@@ -612,6 +653,11 @@ es: {
     });
   }
 
+  // Hero: the button jumps to the questions; the caption names whichever motion the figure is showing
+  let heroKey = null;
+  document.getElementById('heroGo').onclick = () => document.getElementById('chooser').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  document.getElementById('heroFig').addEventListener('figclip', e => { heroKey = e.detail; document.getElementById('heroCap').textContent = S('hero_caps')[heroKey] || ''; });
+
   function renderStatic() {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-s]').forEach(e => e.textContent = S(e.dataset.s));
@@ -621,6 +667,7 @@ es: {
     lw.innerHTML = langs.map(l => `<button aria-pressed="${l === lang}" data-l="${l}">${esc(STR[l].lang_name)}</button>`).join('');
     lw.querySelectorAll('button').forEach(b => b.onclick = () => { lang = b.dataset.l; try { localStorage.setItem('mor-lang', lang); } catch (e) {} render(false); });
     document.getElementById('trainBtn').href = TRAINING_BOOK;
+    document.getElementById('heroCap').textContent = heroKey ? (S('hero_caps')[heroKey] || '') : '';
     const groups = ['legs', 'throw', 'arm'];
     document.getElementById('groups').innerHTML = groups.map(g => `<div class="group"><h3>${esc(S('g_' + g))}</h3><div class="cards">${
       Object.keys(SERVICES).filter(id => SERVICES[id].group === g).map(id => { const s = SERVICES[id], t = dur(s.minutes);
