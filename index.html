@@ -100,6 +100,7 @@ h2.q { font: 700 clamp(28px, 6vw, 36px)/1.1 'Barlow Condensed', sans-serif; marg
 
 .res h2 { font: 700 clamp(34px, 8vw, 46px)/1 'Barlow Condensed', sans-serif; margin-top: 8px; }
 .aka { color: var(--muted); font-size: 16px; margin-top: 6px; }
+.mb { font-size: 14px; color: var(--muted); margin-top: 4px; font-style: italic; }
 .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
 .pill { font-size: 15px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--tint); }
 .pill.tbd { background: var(--warn-bg); color: var(--warn); }
@@ -251,7 +252,7 @@ window.STR = { en: {
   o_throw: 'Throwing', o_throw_sub: 'Baseball or softball',
   o_run: 'Running', o_run_sub: 'Jogging, races, cross country',
   o_legs: 'Assessment after a hip, knee, or ankle injury', o_legs_sub: '',
-  o_arm: 'My shoulder, elbow, or arm', o_arm_sub: 'I am not a thrower',
+  o_arm: 'A non-throwing issue with my arm, elbow, or shoulder', o_arm_sub: '',
 
   q_throw: 'Where are you with throwing?',
   o_throw_start: 'Hurt or had surgery, about to start throwing again', o_throw_start_sub: 'Or just started a throwing program',
@@ -367,6 +368,143 @@ window.STR = { en: {
       wear: 'A T-shirt or tank top so we can see your shoulders.',   // DRAFT
     },
   },
+},
+
+// Spanish (Claude's translation, formal "usted"; needs a fluent staff member's review before it goes live).
+// Service names are translated, and each card also shows its English Mindbody name (mb_name) so people can
+// find the same appointment in the app. Videos and sample reports are English only, so their buttons say so.
+es: {
+  lang_name: 'Español',
+  title: 'Encuentre su evaluación',
+  kicker: 'MOR Sports Performance',
+  lede: 'Responda dos o tres preguntas rápidas y le indicaremos la cita correcta.',
+  open_note: 'Abierto a pacientes y al público. ¡No necesita referido ni receta médica!',
+  doctor_note: '¿Su médico le ordenó una “Functional Sports Assessment” o “Sports Assessment”? Empiece aquí. Estas preguntas le indican cuál es la correcta.',
+  step: 'Pregunta {n}',
+  back: 'Atrás',
+  start_over: 'Empezar de nuevo',
+
+  q_start: '¿Cómo podemos ayudarle a alcanzar sus metas?',
+  o_throw: 'Lanzar', o_throw_sub: 'Béisbol o sóftbol',
+  o_run: 'Correr', o_run_sub: 'Trotar, carreras, campo traviesa',
+  o_legs: 'Evaluación después de una lesión de cadera, rodilla o tobillo', o_legs_sub: '',
+  o_arm: 'Un problema del brazo, codo u hombro que no es por lanzar', o_arm_sub: '',
+
+  q_throw: '¿En qué punto está con sus lanzamientos?',
+  o_throw_start: 'Me lesioné o tuve cirugía y estoy por volver a lanzar', o_throw_start_sub: 'O acabo de empezar un programa de lanzamiento',
+  o_throw_hard: 'Me lesioné o tuve cirugía y ya lanzo con fuerza', o_throw_hard_sub: 'A 120 pies o desde el montículo',
+  o_throw_healthy: 'No estoy lesionado; quiero lanzar mejor', o_throw_healthy_sub: 'Vea su mecánica en 3D',
+
+  q_throw_healthy: '¿Qué quiere saber?',
+  o_mocap_only: 'Cómo lanzo', o_mocap_only_sub: 'Solo la captura de movimiento en 3D, aproximadamente 1 hora',
+  o_mocap_full: 'Cómo lanzo y por qué', o_mocap_full_sub: 'Captura de movimiento más pruebas de fuerza y flexibilidad',
+
+  q_run: '¿En qué punto está con correr?',
+  o_run_start: 'Me lesioné o tuve cirugía y todavía no corro', o_run_start_sub: 'Empezando a saltar en terapia',
+  o_run_going: 'Ya estoy corriendo', o_run_going_sub: 'Volviendo a correr, o quiero correr mejor',
+
+  q_legs: '¿En qué punto está después de su lesión o cirugía?',
+  o_legs_start: 'Apenas empiezo a correr o saltar en terapia', o_legs_start_sub: '',
+  o_legs_hard: 'Aumentando poco a poco las actividades específicas de mi deporte', o_legs_hard_sub: '',
+
+  result_kicker: 'Su evaluación',
+  for_you: 'Esto es para usted si',
+  what_happens: 'Qué pasa',
+  wear: 'Qué ponerse y qué traer',
+  time: 'Calcule aproximadamente {t}',
+  price_tbd: 'Precio: por confirmar',
+  book: 'Reservar esta evaluación',
+  call_to_book: 'Llame al 708-492-5782 para reservar',
+  sample: 'Ver un informe de ejemplo (en inglés)',
+  sample2: 'Informe de ejemplo de sóftbol (en inglés)',
+  lab_link: 'Vea lo que le muestra el laboratorio',
+  video: 'Ver un video corto (en inglés)',
+  share: 'Copiar un enlace a esta página',
+  copied: 'Enlace copiado',
+  not_right: '¿No es lo que busca? Llámenos al 708-492-5782 y le ayudamos a elegir.',
+  code_line: 'Use el código MORSPC al reservar en línea y obtenga $25 de descuento en su primera cita.',
+  mb_name: 'En Mindbody se llama: {n}',
+
+  all_title: 'Todas las evaluaciones',
+  all_lede: '¿Ya sabe lo que necesita? Aquí está todo lo que ofrecemos.',
+  details: 'Detalles',
+  g_throw: 'Lanzamiento', g_legs: 'Piernas y carrera', g_arm: 'Hombro y brazo',
+
+  faq_title: 'Información útil',
+  faq: [
+    ['¿Necesito un referido o una receta médica?', 'No. Todos los servicios están disponibles para pacientes y para el público. ¡No necesita referido ni receta médica!'],
+    ['¿Cómo pago? ¿Lo cubre el seguro?', 'Todos los servicios de Sports Performance son de pago directo. A veces las tarjetas HSA y FSA son rechazadas al pagar, así que quizás tenga que pagar de otra forma y pedir el reembolso. Su recibo incluye los códigos de facturación comunes de los servicios de Athletic Training (entrenamiento atlético).'],
+    ['¿Tengo que terminar la fisioterapia primero?', 'Podemos trabajar con usted en cualquier momento. Nuestros servicios complementan la fisioterapia y sirven como transición o puente para volver a la actividad.'],
+    ['¿Hay algún descuento?', 'Reserve en línea y use el código MORSPC al pagar para obtener $25 de descuento en su primera cita.'],
+    ['¿Puedo reservar desde mi teléfono?', 'Sí. Descargue la aplicación Mindbody y busque Midwest Orthopaedics.'],
+    ['¿Qué pasa después de mi evaluación?', 'Revisamos sus resultados con usted el mismo día y le enviamos su informe por correo electrónico. Después recibe ejercicios para trabajar en las deficiencias encontradas. Luego puede entrenar por su cuenta o trabajar con nosotros en sesiones de entrenamiento individuales.'],
+  ],
+  training_book: 'Reservar una sesión de entrenamiento',
+  apps: 'Descargue la aplicación Mindbody',
+  ios: 'App Store (iPhone)', android: 'Google Play (Android)',
+  contact: '¿Preguntas? Llame al 708-492-5782 o escriba a spc@rushortho.com',
+  where: 'MOR Sports Performance · Bo Jackson’s Elite Sports Dome, Bensenville',
+
+  minutes: '{n} minutos', hours: '{n} horas', hour1: '1 hora',
+
+  svc: {
+    throwPrep: {
+      name: 'Evaluación previa al lanzamiento',
+      for: 'Se lastimó el brazo o tuvo cirugía (por ejemplo, Tommy John o una reparación del labrum) y está por volver a lanzar.',
+      what: ['Medimos su fuerza, flexibilidad y estabilidad desde los tobillos hasta el codo.',
+             'Empieza nuestro programa de lanzamiento y hace su primer día de lanzamientos con nosotros.'],
+      wear: 'Ropa deportiva y tenis. Traiga su guante.',
+    },
+    throwing: {
+      name: 'Evaluación de lanzamiento',
+      aka: 'Béisbol o sóftbol. Su médico podría llamarla “Overhead FSA”.',
+      for: 'Juega béisbol o sóftbol y ya lanza con fuerza: a 120 pies o desde el montículo. Los lanzadores sin lesiones también son bienvenidos.',
+      what: ['Medimos su fuerza y flexibilidad.',
+             'Calienta y luego lanza con máximo esfuerzo en nuestro laboratorio de captura de movimiento en 3D.',
+             'Revisamos sus resultados con usted el mismo día y le enviamos el informe a usted y a su médico por correo electrónico.'],
+      wear: 'Ropa deportiva, su guante y los zapatos con los que lanza. Traiga cualquier equipo especial que use para calentar.',
+    },
+    mocap: {
+      name: 'Solo captura de movimiento del lanzamiento',
+      for: 'No está lesionado. Solo quiere ver su lanzamiento en 3D en nuestro laboratorio de captura de movimiento, uno de los pocos que existen.',
+      what: ['Calienta y lanza en el laboratorio.',
+             'Su lanzamiento se captura en 3D a 300 cuadros por segundo.',
+             'Lleve los resultados a su entrenador de pitcheo.'],
+      wear: 'Ropa deportiva, su guante y los zapatos con los que lanza.',
+    },
+    plyo: {
+      name: 'Evaluación previa a la pliometría',
+      for: 'Se lastimó la cadera, la rodilla o el tobillo o tuvo cirugía, y apenas empieza a correr o saltar en terapia.',
+      what: ['Medimos la fuerza de ambas piernas para saber desde dónde empieza.',
+             'Sensores de movimiento en la espalda y las piernas registran planchas, sentadillas a una pierna y zancadas. Si ya está saltando, también lo evaluamos.'],
+      wear: 'Ropa deportiva.',
+    },
+    lba: {
+      name: 'Evaluación del tren inferior',
+      aka: 'Su médico podría llamarla “Functional Sports Assessment (FSA)”.',
+      for: 'Se lastimó la cadera, la rodilla o el tobillo o tuvo cirugía, y está aumentando poco a poco las actividades específicas de su deporte, como correr, saltar y cambiar de dirección.',
+      what: ['Evaluamos su fuerza, equilibrio, flexibilidad y potencia.',
+             'Sensores de movimiento y plataformas de fuerza registran sus sentadillas, saltos y cambios de dirección.',
+             'Recibe un informe que muestra en qué trabajar para volver a su deporte.'],
+      wear: 'Ropa deportiva y tenis.',
+    },
+    running: {
+      name: 'Evaluación de carrera',
+      for: 'Está volviendo a correr, desde trotes suaves hasta entrenamiento para maratón o campo traviesa.',
+      what: ['Medimos la fuerza y flexibilidad de sus caderas, rodillas y tobillos.',
+             'Corre en una caminadora en nuestro laboratorio de captura de movimiento en 3D.',
+             'Revisamos sus resultados el mismo día y le enviamos el informe a usted y a su médico por correo electrónico.'],
+      wear: 'Ropa para correr y los tenis que usa normalmente.',
+    },
+    upper: {
+      name: 'Evaluación del tren superior',
+      for: 'Tiene un problema en el hombro, el codo o el brazo y no es lanzador. Por ejemplo: levantar pesas, deportes con los brazos por encima de la cabeza o la vida diaria.',
+      what: ['Evaluamos la movilidad, fuerza y estabilidad de sus hombros y brazos.',
+             'Observamos cómo se mueve su brazo.',
+             'Recibe un plan para ayudarle a moverse mejor.'],
+      wear: 'Una camiseta o camiseta sin mangas para que podamos ver sus hombros.',
+    },
+  },
 }};
 
 </script>
@@ -387,11 +525,14 @@ window.STR = { en: {
 
   let lang = 'en';
   try { const q = new URLSearchParams(location.search).get('lang'); const s = localStorage.getItem('mor-lang');
-        lang = (q && STR[q]) ? q : (s && STR[s]) ? s : 'en'; } catch (e) {}
+        const nav = (navigator.language || '').slice(0, 2);   // first visit: follow the phone's language
+        lang = (q && STR[q]) ? q : (s && STR[s]) ? s : STR[nav] ? nav : 'en'; } catch (e) {}
   const S = k => (STR[lang] && STR[lang][k] != null) ? STR[lang][k] : STR.en[k];
   const V = (id, k) => { const a = STR[lang] && STR[lang].svc && STR[lang].svc[id]; return (a && a[k] != null) ? a[k] : STR.en.svc[id][k]; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
+  // Outside English, show the English name too: Mindbody lists the appointments only in English
+  const mbName = id => lang === 'en' ? '' : `<p class="mb">${esc(fmt(S('mb_name'), { n: STR.en.svc[id].name }))}</p>`;
   const dur = m => m == null ? null : m < 60 ? fmt(S('minutes'), { n: m }) : m === 60 ? S('hour1') : fmt(S('hours'), { n: +(m / 60).toFixed(1) });
 
   // history of question ids; the hash records it so the browser back button and shared links work
@@ -436,6 +577,7 @@ window.STR = { en: {
       ${s.fig ? `<div class="fig" data-fig="${s.fig}" aria-hidden="true"><canvas></canvas></div>` : ''}
       <div class="step">${esc(S('result_kicker'))}</div>
       <h2>${esc(V(id, 'name'))}</h2>
+      ${mbName(id)}
       ${aka ? `<p class="aka">${esc(aka)}</p>` : ''}
       <div class="facts">
         ${s.price ? `<span class="pill">${esc(s.price)}</span>` : `<span class="pill tbd">${esc(S('price_tbd'))}</span>`}
@@ -480,7 +622,7 @@ window.STR = { en: {
     const groups = ['legs', 'throw', 'arm'];
     document.getElementById('groups').innerHTML = groups.map(g => `<div class="group"><h3>${esc(S('g_' + g))}</h3><div class="cards">${
       Object.keys(SERVICES).filter(id => SERVICES[id].group === g).map(id => { const s = SERVICES[id], t = dur(s.minutes);
-        return `<div class="card">${s.fig ? `<div class="fig" data-fig="${s.fig}" aria-hidden="true"><canvas></canvas></div>` : ''}<div class="t">${esc(V(id, 'name'))}</div>
+        return `<div class="card">${s.fig ? `<div class="fig" data-fig="${s.fig}" aria-hidden="true"><canvas></canvas></div>` : ''}<div class="t">${esc(V(id, 'name'))}</div>${mbName(id)}
           <div class="meta">${esc([s.price || S('price_tbd'), t].filter(Boolean).join(' · '))}</div>
           <p>${esc(V(id, 'for'))}</p>
           <div class="row">${s.book ? `<a class="btn" href="${s.book}" target="_blank" rel="noopener">${esc(S('book'))}</a>` : `<a class="btn" href="tel:+17084925782">${esc(S('call_to_book'))}</a>`}
