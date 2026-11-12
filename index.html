@@ -159,6 +159,31 @@ section h2.sec { font: 700 34px/1.1 'Barlow Condensed', sans-serif; }
 .card .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .card .row .btn { min-height: 44px; font-size: 16px; padding: 10px 16px; flex: 1 1 140px; }
 
+/* Recovery path: a vertical timeline on phones, a row of four on wider screens; the nodes glow in order */
+section.path { padding: 52px 0 0; }
+.steps { list-style: none; display: grid; margin-top: 20px; }
+.step-i { position: relative; padding: 0 0 26px 54px; }
+.step-i::before { content: ''; position: absolute; left: 17px; top: 38px; bottom: 2px; width: 2px; border-radius: 2px;
+  background: linear-gradient(var(--accent), rgba(40,191,161,.18)); }
+.step-i:last-child::before { display: none; }
+.node { position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  font: 700 18px/1 'Barlow Condensed', sans-serif; background: #0b0f14; color: #7ff0d6; border: 2px solid var(--accent);
+  box-shadow: 0 0 0 4px rgba(40,191,161,.14); animation: node 4s ease-in-out infinite; animation-delay: calc(var(--i) * .7s); }
+@keyframes node { 0%, 30%, 100% { box-shadow: 0 0 0 4px rgba(40,191,161,.14); } 12% { box-shadow: 0 0 0 7px rgba(40,191,161,.22), 0 0 22px rgba(40,191,161,.75); } }
+.step-k { font: 600 13px/1 'Barlow Condensed', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); padding-top: 2px; }
+.step-i h3 { font: 700 24px/1.1 'Barlow Condensed', sans-serif; margin-top: 4px; }
+.step-i p { color: var(--muted); font-size: 16px; margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip { font: 600 14px/1.2 'Barlow', sans-serif; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--accent); background: var(--paper);
+  color: var(--ink); cursor: pointer; text-decoration: none; text-align: left; transition: background .15s, transform .15s; }
+.chip:hover, .chip:focus-visible { background: var(--tint); transform: translateY(-1px); outline: none; }
+.healthy { margin-top: 4px; padding: 14px 16px; border: 1px dashed var(--accent); border-radius: 12px; font-size: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+@media (min-width: 760px) {
+  .steps { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .step-i { padding: 52px 0 18px; }
+  .step-i::before { left: 44px; right: -14px; top: 17px; bottom: auto; width: auto; height: 2px; background: linear-gradient(90deg, var(--accent), rgba(40,191,161,.18)); }
+}
+@media (prefers-reduced-motion: reduce) { .node { animation: none; } .chip { transition: none; } }
 section.faq { padding: 48px 0 0; }
 details { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; margin-top: 10px; }
 summary { cursor: pointer; padding: 16px; font-weight: 600; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
@@ -207,6 +232,12 @@ footer a { color: var(--accent); font-weight: 600; }
   <p class="doctor" data-s="doctor_note"></p>
   <main>
     <div id="chooser" class="panel" aria-live="polite"></div>
+    <section class="path" id="path">
+      <h2 class="sec" data-s="path_title"></h2>
+      <p class="sec-lede" data-s="path_lede"></p>
+      <ol class="steps" id="steps"></ol>
+      <p class="healthy" id="healthy"></p>
+    </section>
     <section class="faq">
       <h2 class="sec" data-s="faq_title"></h2>
       <div id="faq"></div>
@@ -332,6 +363,18 @@ window.STR = { en: {
   details: 'Details',
   g_throw: 'Throwing', g_legs: 'Legs and running', g_arm: 'Shoulder and arm',
 
+  // Recovery path strip. chips: assessment ids (open that result) or 'train' (training booking link). DRAFT wording.
+  path_title: 'Your path back',
+  path_lede: 'Where you are in your recovery decides where you start.',
+  path: [
+    { t: 'Physical therapy', d: 'Your therapist gets you moving again. We can work with you at any point along the way.', chips: [] },
+    { t: 'Prep screens', d: 'Just starting to run, jump, or throw in therapy.', chips: ['plyo', 'throwPrep'] },
+    { t: 'Full assessment', d: 'Ramping up into sport-specific tasks.', chips: ['lba', 'throwing', 'running', 'upper'] },
+    { t: 'Training', d: 'Exercises to address what we found, on your own or one-on-one with us.', chips: ['train'] },
+  ],
+  path_step: 'Step {n}',
+  path_train: 'Book training',
+  path_healthy: 'Not recovering from an injury? Start with a full assessment, or see your throw in 3D:',
   faq_title: 'Good to know',
   faq: [
     ['Do I need a referral or prescription?', 'No. All services are available to both patients and the public. No referral or prescription needed!'],
@@ -472,6 +515,17 @@ es: {
   details: 'Detalles',
   g_throw: 'Lanzamiento', g_legs: 'Piernas y carrera', g_arm: 'Hombro y brazo',
 
+  path_title: 'Su camino de regreso',
+  path_lede: 'Su punto de partida depende de en qué etapa de su recuperación está.',
+  path: [
+    { t: 'Fisioterapia', d: 'Su terapeuta le ayuda a volver a moverse. Podemos trabajar con usted en cualquier momento del proceso.', chips: [] },
+    { t: 'Evaluaciones previas', d: 'Apenas empieza a correr, saltar o lanzar en terapia.', chips: ['plyo', 'throwPrep'] },
+    { t: 'Evaluación completa', d: 'Aumentando poco a poco las actividades específicas de su deporte.', chips: ['lba', 'throwing', 'running', 'upper'] },
+    { t: 'Entrenamiento', d: 'Ejercicios para trabajar en lo que encontramos, por su cuenta o en sesiones individuales con nosotros.', chips: ['train'] },
+  ],
+  path_step: 'Paso {n}',
+  path_train: 'Reservar entrenamiento',
+  path_healthy: '¿No se está recuperando de una lesión? Empiece con una evaluación completa, o vea su lanzamiento en 3D:',
   faq_title: 'Información útil',
   faq: [
     ['¿Necesito un referido o una receta médica?', 'No. Todos los servicios están disponibles para pacientes y para el público. ¡No necesita referido ni receta médica!'],
@@ -678,6 +732,17 @@ es: {
           <button class="btn ghost" data-a="${id}">${esc(S('details'))}</button></div></div>`; }).join('')
     }</div></div>`).join('');
     document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => go(['start'], b.dataset.a));
+    // Recovery path: assessment chips open that result in the chooser; the training chip goes to booking
+    const chip = id => id === 'train'
+      ? `<a class="chip" href="${TRAINING_BOOK}" target="_blank" rel="noopener">${esc(S('path_train'))}</a>`
+      : `<button class="chip" data-a="${id}">${esc(V(id, 'name'))}</button>`;
+    document.getElementById('steps').innerHTML = S('path').map((st, i) => `<li class="step-i" style="--i:${i}">
+      <span class="node" aria-hidden="true">${i + 1}</span>
+      <div class="step-k">${esc(fmt(S('path_step'), { n: i + 1 }))}</div>
+      <h3>${esc(st.t)}</h3><p>${esc(st.d)}</p>
+      ${st.chips.length ? `<div class="chips">${st.chips.map(chip).join('')}</div>` : ''}</li>`).join('');
+    document.getElementById('healthy').innerHTML = `<span>${esc(S('path_healthy'))}</span>${chip('mocap')}`;
+    document.querySelectorAll('#path [data-a]').forEach(b => b.onclick = () => go(['start'], b.dataset.a));
     document.getElementById('faq').innerHTML = S('faq').map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
   }
   // The figures' 3D pieces (~1.5 MB) load in the background after the page is up, so the questions show instantly
