@@ -201,7 +201,7 @@ const REPORTS = 'https://morsportsperformance.github.io/mor-sports-performance/'
 // fig = which neon X Bot figure the card and result show (same clips as the sample reports page)
 window.SERVICES = {
   throwPrep: { group: 'throw', fig: 'throw-prep', book: BOOK(30), video: 'Vqx7PQK07hE', report: null,           price: '$249', minutes: 90 },
-  throwing:  { group: 'throw', fig: 'softball', book: BOOK(12), video: 'h4fmiZQKShQ', report: REPORTS + '#pitching', report2: REPORTS + '#softball', price: '$349', minutes: 90 },
+  throwing:  { group: 'throw', fig: 'throw-both', book: BOOK(12), video: 'h4fmiZQKShQ', report: REPORTS + '#pitching', report2: REPORTS + '#softball', price: '$349', minutes: 90 },
   mocap:     { group: 'throw', fig: 'pitching', book: BOOK(35), video: 'Vqx7PQK07hE', report: null, lab: 'https://morsportsperformance.github.io/TVloop/book/', price: '$249', minutes: 60 },
   plyo:      { group: 'legs', fig: 'sl-squat',  book: BOOK(27), video: 'vPuw8BnEX3w', report: null,           price: '$249', minutes: 30 },
   lba:       { group: 'legs', fig: 'lower-body',  book: BOOK(5),  video: 'WD2CXEOYAeY', report: REPORTS + '#lower-body', price: '$349', minutes: 120 },
@@ -639,7 +639,7 @@ es: {
     if (window.MORFigs) { MORFigs.scan(); return; }
     if (figsLoading || !document.querySelector('.fig[data-fig]')) return;
     figsLoading = true;
-    const s = document.createElement('script'); s.src = 'figs.js'; s.async = true;
+    const s = document.createElement('script'); s.src = 'figs.js?v=cdfe3936f7'; s.async = true;
     s.onerror = () => document.querySelectorAll('.fig').forEach(f => f.classList.add('off'));
     document.head.appendChild(s);
   }

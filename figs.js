@@ -4123,13 +4123,46 @@ window.__XBOT = 'S2F5ZGFyYSBGQlggQmluYXJ5ICAAGgAUHgAApgsAAAAAAAAAAAAAAAAAAAAAAAA
   }
   const POSED = { 'lower-body': hop, 'sl-squat': slSquat, 'throw-prep': cuff };
 
+  // Hero: one figure that cycles through several motions on the same model, fading between them.
+  // Posed motions are built first (they read the bind pose); every switch restores the bind pose, then the
+  // clip's own placement. Fires a 'figclip' event on the host with the motion's name, for the page's caption.
+  const CYCLES = { hero: ['pitching', 'running', 'sl-squat', 'softball'], 'throw-both': ['pitching', 'softball'] };
+  function cycle(HERO, bd, grid, cv, host) {
+    const snap = [];
+    bd.group.traverse(o => { if (o.isBone) snap.push([o, o.quaternion.clone(), o.position.clone()]); });
+    const reset = () => { snap.forEach(([b, q, p]) => { b.quaternion.copy(q); b.position.copy(p); });
+                          bd.group.rotation.set(0, 0, 0); bd.group.position.set(0, 0, 0); bd.group.updateMatrixWorld(true); };
+    const built = {};
+    HERO.filter(n => POSED[n]).forEach(n => { reset(); built[n] = POSED[n](bd); });
+    HERO.filter(n => FIGS[n]).forEach(n => { reset(); const c = capture(FIGS[n], bd); c.rot = bd.group.rotation.y; c.py = bd.group.position.y; built[n] = c; });
+    const segs = []; let total = 0;
+    HERO.forEach(n => { const c = built[n], len = c.dur * Math.max(1, Math.ceil(5.5 / c.dur)); segs.push({ n, c, t0: total, len }); total += len; });
+    cv.style.transition = 'none';
+    let cur = null;
+    const FADE = 0.45;
+    return {
+      dur: total, still: segs[0].c.still, belt: 0,
+      frame(t) {
+        const s = segs.find(x => t < x.t0 + x.len) || segs[segs.length - 1], u = t - s.t0;
+        if (s !== cur) {
+          cur = s; reset(); grid.position.x = 0;
+          if (s.c.rot != null) { bd.group.rotation.y = s.c.rot; bd.group.position.y = s.c.py; }
+          host.dispatchEvent(new CustomEvent('figclip', { detail: s.n }));
+        }
+        s.c.frame(u % s.c.dur);
+        if (s.c.belt) grid.position.x = -((t * s.c.belt) % 0.2);
+        cv.style.opacity = reduce ? 1 : Math.min(1, u / FADE, (s.len - u) / FADE);   // fade out, switch, fade in
+      },
+    };
+  }
+
   function view(host) {
     const name = host.dataset.fig, cv = host.querySelector('canvas');
     const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
     const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(26, 1, 0.05, 40);
     const bd = body(getModel()); scene.add(bd.group);
     const grid = new THREE.GridHelper(8, 40, ACCENT, ACCENT); grid.material.transparent = true; grid.material.opacity = 0.16; scene.add(grid);
-    const clip = FIGS[name] ? capture(FIGS[name], bd) : (POSED[name] || hop)(bd);
+    const clip = CYCLES[name] ? cycle(CYCLES[name], bd, grid, cv, host) : FIGS[name] ? capture(FIGS[name], bd) : (POSED[name] || hop)(bd);
     const look = new THREE.Vector3(0, 1.0, 0);   // a little headroom for arms overhead
     camera.position.set(0.9, 1.2, 5.7); camera.lookAt(look);
     const fit = () => {
