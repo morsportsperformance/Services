@@ -125,12 +125,29 @@ h1 { font: 700 clamp(44px, 10vw, 72px)/.95 'Barlow Condensed', sans-serif; }
 #chooser { margin-top: 16px; scroll-margin-top: 12px; }
 .qhead { display: flex; justify-content: space-between; align-items: center; min-height: 36px; }
 .step { font: 600 14px/1 'Barlow Condensed', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-.dots { display: flex; gap: 6px; }
-.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
-.dots i.on { background: var(--accent); }
+/* progress bar across the top of the questions */
+.prog { height: 6px; border-radius: 999px; background: var(--rule); overflow: hidden; margin-bottom: 14px; }
+.prog i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #28bfa1, #7ff0d6);
+  box-shadow: 0 0 12px rgba(40,191,161,.7); transition: width .6s cubic-bezier(.2,.7,.2,1); }
+/* the picked answer glows; the others step back */
+.opt.picked { border-color: var(--accent); background: var(--tint); box-shadow: 0 0 0 4px rgba(40,191,161,.2), 0 0 30px rgba(40,191,161,.45); }
+.opt.picked .ico { background: var(--accent); color: var(--accent-ink); }
+.opt.dim { opacity: .4; }
+/* phones: Book bar pinned to the bottom on a result */
+.sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: none; transform: translateY(110%); transition: transform .3s cubic-bezier(.2,.7,.2,1);
+  background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--rule);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px -20px var(--shadow); }
+.sticky.show { transform: none; }
+.sticky-in { display: flex; align-items: center; gap: 12px; max-width: 760px; margin: 0 auto; }
+.sticky-t { flex: 1; min-width: 0; }
+.sticky-t b { display: block; font-size: 16px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sticky-t span { font-size: 14px; color: var(--muted); }
+.sticky .btn { min-height: 48px; padding: 10px 22px; font-size: 17px; flex: none; }
+@media (max-width: 639px) { .sticky { display: block; } body.has-sticky { padding-bottom: 84px; } }   /* keep the footer clear of the bar */
+@media (prefers-reduced-motion: reduce) { .prog i, .sticky { transition: none; } }
 h2.q { font: 700 clamp(28px, 6vw, 36px)/1.1 'Barlow Condensed', sans-serif; margin: 10px 0 18px; }
 .opts { display: grid; gap: 10px; }
-.opt { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 72px; padding: 14px 16px; border: 2px solid var(--rule); border-radius: 14px; background: var(--paper); color: var(--ink); cursor: pointer; font: inherit; transition: border-color .15s, transform .15s; }
+.opt { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 72px; padding: 14px 16px; border: 2px solid var(--rule); border-radius: 14px; background: var(--paper); color: var(--ink); cursor: pointer; font: inherit; transition: border-color .15s, transform .15s, box-shadow .25s, opacity .25s, background .25s; }
 .opt:hover, .opt:focus-visible { border-color: var(--accent); outline: none; transform: translateY(-1px); }
 .opt .ico { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--tint); color: var(--accent); display: grid; place-items: center; }
 .opt .ico svg { width: 26px; height: 26px; }
@@ -302,6 +319,7 @@ footer a { color: var(--accent); font-weight: 600; }
     <div data-s="where"></div>
   </footer>
 </div>
+<div class="sticky" id="sticky"><div class="sticky-in"><div class="sticky-t" id="stickyT"></div><a class="btn" id="stickyBtn" target="_blank" rel="noopener"></a></div></div>
 <script>
 // Everything a visitor reads lives here. To add Spanish, copy the `en` block to `es`
 // and translate the text. Keys, prices, booking IDs, and video IDs are shared.
@@ -356,7 +374,7 @@ window.STR = { en: {
   lede: 'Answer two or three quick questions and we will point you to the right appointment.',
   open_note: 'Open to patients and the public. No referral or prescription needed!',
   start_btn: 'Find my assessment',
-  // "What you get" strip along the bottom of the hero. Facts only: 300 fps is the throwing capture (TV loop wording),
+  // "What you get" strip along the bottom of the hero. Facts only: "300 frames per second on every movement" is Dave's wording,
   // same day + emailed report + exercises are from the FAQ answer Dave wrote. count = animate the number up once.
   gets: [
     { big: '300', count: 300, sub: 'frames per second on every movement' },
@@ -400,6 +418,7 @@ window.STR = { en: {
   time: 'Plan for about {t}',
   price_tbd: 'Price: TBD',
   book: 'Book this assessment',
+  book_short: 'Book',
   call_to_book: 'Call 708-492-5782 to book',
   sample: 'See a sample report',
   sample2: 'Softball sample report',
@@ -573,6 +592,7 @@ es: {
   time: 'Calcule aproximadamente {t}',
   price_tbd: 'Precio: por confirmar',
   book: 'Reservar esta evaluación',
+  book_short: 'Reservar',
   call_to_book: 'Llame al 708-492-5782 para reservar',
   sample: 'Ver un informe de ejemplo (en inglés)',
   sample2: 'Informe de ejemplo de sóftbol (en inglés)',
@@ -735,22 +755,52 @@ es: {
     render(true);
   }
 
+  const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // longest run of questions from this one to a result (this question included)
+  const depth = id => 1 + Math.max(0, ...TREE[id].opts.filter(o => o.to).map(o => depth(o.to)));
+  let lastPct = 0;
+
+  // Phones: on a result, a Book bar pins to the bottom whenever the result's own Book button is off screen
+  let stickyIO = null;
+  function sticky() {
+    const bar = document.getElementById('sticky');
+    if (stickyIO) { stickyIO.disconnect(); stickyIO = null; }
+    const main = result && document.querySelector('#chooser .btns .btn');
+    if (!main) { bar.classList.remove('show'); document.body.classList.remove('has-sticky'); return; }
+    const s = SERVICES[result];
+    document.getElementById('stickyT').innerHTML = `<b>${esc(V(result, 'name'))}</b><span>${esc(s.price || '')}</span>`;
+    const btn = document.getElementById('stickyBtn');
+    btn.textContent = S('book_short'); btn.href = main.href;
+    stickyIO = new IntersectionObserver(es => { const on = !es[0].isIntersecting; bar.classList.toggle('show', on); document.body.classList.toggle('has-sticky', on); });
+    stickyIO.observe(main);
+  }
+
   function renderChooser(scroll) {
     const el = document.getElementById('chooser');
     if (result) { el.innerHTML = resultHTML(result); wireResult(el); }
     else {
       const id = path[path.length - 1], node = TREE[id], n = path.length;
+      // progress: this question's place among the questions on the longest path still ahead, plus the result
+      const pct = Math.round(100 * n / (n + depth(id)));
       el.innerHTML = `<div class="fade">
-        <div class="qhead"><span class="step">${esc(fmt(S('step'), { n }))}</span><span class="dots">${[1,2,3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</span></div>
+        <div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${lastPct}%"></i></div>
+        <div class="qhead"><span class="step">${esc(fmt(S('step'), { n }))}</span></div>
         <h2 class="q">${esc(S(node.q))}</h2>
         <div class="opts">${node.opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="ico">${ICONS[OPT_ICON[o.t]] || ''}</span><span><b>${esc(S(o.t))}</b>${S(o.t + '_sub') ? `<small>${esc(S(o.t + '_sub'))}</small>` : ''}</span><span class="arr" aria-hidden="true">›</span></button>`).join('')}</div>
         ${n > 1 ? `<div class="nav"><button class="link" data-act="back">${esc(S('back'))}</button><button class="link" data-act="restart">${esc(S('start_over'))}</button></div>` : ''}
       </div>`;
+      setTimeout(() => { const f = el.querySelector('.prog i'); if (f) f.style.width = pct + '%'; }, 30);   // grow from the last value
+      lastPct = pct;
+      // the picked answer glows for a moment (the others dim) before the next question comes in
+      let picked = false;
       el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+        if (picked) return; picked = true;
+        b.classList.add('picked'); el.querySelectorAll('.opt').forEach(x => { if (x !== b) x.classList.add('dim'); });
         const o = node.opts[+b.dataset.i];
-        if (o.result) go(path, o.result); else go(path.concat(o.to), null);
+        setTimeout(() => { if (o.result) go(path, o.result); else go(path.concat(o.to), null); }, reduceMotion() ? 0 : 280);
       });
     }
+    sticky();
     // A shared link opens straight on a result; Back there means "start the questions", not "leave the site"
     el.querySelectorAll('[data-act=back]').forEach(b => b.onclick = () => (history.state && history.state.inApp) ? history.back() : go(['start'], null));
     el.querySelectorAll('[data-act=restart]').forEach(b => b.onclick = () => go(['start'], null));
